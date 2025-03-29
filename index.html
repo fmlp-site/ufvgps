@@ -1,0 +1,149 @@
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GPS - Gerenciamento de Processo Seletivo</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/backendless/6.0.0/backendless.min.js"></script>
+</head>
+<body class="bg-gray-100">
+    <div class="flex">
+        <!-- Sidebar -->
+        <div class="w-1/4 bg-white h-screen p-4">
+            <h1 class="text-xl font-bold mb-4">GPS - Gerenciamento de Processo Seletivo</h1>
+            <nav>
+                <ul>
+                    <li class="mb-2"><a href="#" class="text-gray-700">Editais</a></li>
+                    <li><a href="#" class="text-gray-700">Meu espaço</a></li>
+                </ul>
+            </nav>
+        </div>
+        <!-- Main Content -->
+        <div class="w-3/4 p-4">
+            <div class="flex justify-between items-center mb-4">
+                <div>
+                    <span class="text-gray-600">Você está em:</span> <span class="font-bold">Editais</span>
+                </div>
+                <div>
+                    <label for="language" class="text-gray-600">Idioma</label>
+                    <select id="language" class="border border-gray-300 rounded p-1">
+                        <option>Português</option>
+                        <option>English</option>
+                    </select>
+                </div>
+            </div>
+            <h2 class="text-2xl font-bold mb-4">Editais</h2>
+            <div class="bg-white p-4 rounded shadow mb-4">
+                <h3 class="font-bold mb-2">Filtros de pesquisa</h3>
+                <div class="grid grid-cols-1 gap-4">
+                    <div>
+                        <label for="title" class="block text-gray-700">Título:</label>
+                        <input type="text" id="title" class="border border-gray-300 rounded w-full p-2">
+                    </div>
+                    <div>
+                        <label for="campus" class="block text-gray-700">Campus:</label>
+                        <select id="campus" class="border border-gray-300 rounded w-full p-2">
+                            <option>Nenhum selecionado</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label for="status" class="block text-gray-700">Situação:</label>
+                        <select id="status" class="border border-gray-300 rounded w-full p-2">
+                            <option>Nenhum selecionado</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label for="category" class="block text-gray-700">Categoria:</label>
+                        <select id="category" class="border border-gray-300 rounded w-full p-2">
+                            <option>Nenhum selecionado</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="flex justify-end mt-4">
+                    <button class="bg-gray-200 text-gray-700 px-4 py-2 rounded mr-2">Atualizar filtragem</button>
+                    <button class="bg-gray-200 text-gray-700 px-4 py-2 rounded">Limpar e atualizar</button>
+                </div>
+            </div>
+            <div class="bg-white p-4 rounded shadow">
+                <table class="w-full table-auto">
+                    <thead>
+                        <tr class="bg-gray-200">
+                            <th class="px-4 py-2 text-left">Título</th>
+                            <th class="px-4 py-2 text-left">Data de início das inscrições</th>
+                            <th class="px-4 py-2 text-left">Data de término das inscrições</th>
+                            <th class="px-4 py-2 text-left">Situação</th>
+                        </tr>
+                    </thead>
+                    <tbody id="editaisTableBody">
+                        <!-- Rows will be inserted here by JavaScript -->
+                    </tbody>
+                </table>
+                <div class="flex justify-between items-center mt-4">
+                    <div>
+                        <label for="itemsPerPage" class="text-gray-600">Itens por página</label>
+                        <select id="itemsPerPage" class="border border-gray-300 rounded p-1">
+                            <option>25</option>
+                            <option>50</option>
+                            <option>100</option>
+                        </select>
+                    </div>
+                    <button class="bg-gray-200 text-gray-700 px-4 py-2 rounded">Atualizar</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Initialize Backendless
+        Backendless.initApp("YOUR-APP-ID", "YOUR-API-KEY");
+
+        // Function to fetch and display editais
+        function fetchEditais() {
+            Backendless.Data.of("Editais").find()
+                .then(function(editais) {
+                    const tableBody = document.getElementById("editaisTableBody");
+                    tableBody.innerHTML = ""; // Clear existing rows
+
+                    editais.forEach(function(edital) {
+                        const row = document.createElement("tr");
+                        row.classList.add("border-t");
+
+                        const titleCell = document.createElement("td");
+                        titleCell.classList.add("px-4", "py-2");
+                        const titleLink = document.createElement("a");
+                        titleLink.href = "#";
+                        titleLink.classList.add("text-blue-600");
+                        titleLink.textContent = edital.titulo;
+                        titleCell.appendChild(titleLink);
+
+                        const startDateCell = document.createElement("td");
+                        startDateCell.classList.add("px-4", "py-2");
+                        startDateCell.textContent = edital.dataInicio;
+
+                        const endDateCell = document.createElement("td");
+                        endDateCell.classList.add("px-4", "py-2");
+                        endDateCell.textContent = edital.dataTermino;
+
+                        const statusCell = document.createElement("td");
+                        statusCell.classList.add("px-4", "py-2");
+                        statusCell.textContent = edital.situacao;
+
+                        row.appendChild(titleCell);
+                        row.appendChild(startDateCell);
+                        row.appendChild(endDateCell);
+                        row.appendChild(statusCell);
+
+                        tableBody.appendChild(row);
+                    });
+                })
+                .catch(function(error) {
+                    console.error("Error fetching editais:", error);
+                });
+        }
+
+        // Fetch editais on page load
+        document.addEventListener("DOMContentLoaded", fetchEditais);
+    </script>
+</body>
+</html>
